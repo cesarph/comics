@@ -1,3 +1,52 @@
 .comic-info-img {
     max-width: 250px;
 }
+.warning {
+    color: #e2bc16;
+    font-style: italic;
+    font-size: 14px;
+}
+
+
+.not-available {
+    color: red;
+    font-style: italic;
+    font-size: 14px;
+}
+
+.container-comic {
+    margin: 50px auto;
+    max-width: 1100px;
+}
+.comic-info, .cart-button{
+    margin-top: 10px;
+}
+
+
+.comic-title {
+    font-weight: bold;
+}
+
+.comic-author {
+    color: grey;
+    margin-bottom: 30px;
+}
+
+.description, .publisher {
+    margin-top: 40px;
+}
+
+.cart-button {
+    background:#e5e6e8;
+    border: 1px solid #c2c4c6;
+    padding: 20px;
+    border-radius: 20px;
+    text-align: center;
+    
+}
+
+.available {
+    color: green;
+    font-style: italic;
+    font-size: 14px;
+}

@@ -1,7 +1,7 @@
 <?php 
     include('conexion.php');
     $comicID = $_GET['id'];
-    
+    $onStock = true;
     $comics = mysqli_query($con, "SELECT c.id_comic, c.descripcion, c.titulo, c.precio, c.cantidad_en_almacen, c.imagen, a.nombre, g.nombre_genero, e.nombre_editorial FROM comics c, autor a, editorial e, genero g WHERE c.autor = a.id_autor AND e.id_editorial = c.editorial AND g.id_genero=c.genero AND c.id_comic=$comicID");
     $result = mysqli_fetch_array($comics);
     
@@ -13,7 +13,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Catalogo</title>
+    <title><?php echo $result['titulo']?></title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
     <link rel="stylesheet" href="../css/index.css">
     <link rel="stylesheet" href="../css/comic.css">
@@ -28,69 +28,86 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="#">Comics eShop</a>
+            <a class="navbar-brand" href="../index.php">Comics</a>
             
             </div>
     
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-            <ul class="nav navbar-nav">
-                <div class="row">
-                    <div class="col-md-8"></div>
-                    <div class="col-md-4">
-                    <form action="navbar-form navbar-right">
-                        <div class="input-group form-group">
-                            <input type="text" class="form-control" placeholder="Buscar">
+                <ul class="nav navbar-nav">
+                    <li><a href="./catalogo.php">Catalogo</a></li>
+                    <form class="navbar-form navbar-right" action="./catalogo.php" method="GET">
+                        
+                        <div class="input-group">
+                            <input type="text" class="form-control" name="titulo" placeholder="Buscar">
                             <span class="input-group-btn">
-                                <button class="btn btn-default" type="button"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
+                                <button class="btn btn-default"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
                             </span>
                         </div>
                     </form>
-                    </di>
-                </div> 
-                
-            </ul>
-            <ul class="nav navbar-nav navbar-right">
-                <li><a href="./catalogo.php">Catalogo</a></li>
-                <li><a href="./carrito.php">Carrito</a></li>
-                <li class="dropdown">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Mi cuenta<span class="caret"></span></a>
-                <ul class="dropdown-menu">
-                    <li><a href="#">Mi cuenta</a></li>
-                    <li><a href="#">Historial de compras</a></li>
-                    <li role="separator" class="divider"></li>
-                    <li><a href="#">Cerrar Sesión</a></li>
                 </ul>
-                </li>
-            </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    
+                    <?php if (isset($_SESSION['userID']) && $_SESSION['userID'] != "") { ?>
+                        <li><a href="./carrito.php">Carrito</a></li>
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Mi cuenta<span class="caret"></span></a>
+                            <ul class="dropdown-menu">
+                                <li><a href="./cuenta.php">Mi cuenta</a></li>
+                                <li><a href="./historial.php">Historial de compras</a></li>
+                                <li role="separator" class="divider"></li>
+                                <li><a href="./cerrar-sesion.php">Cerrar Sesión</a></li>
+                            </ul>
+                        </li>
+                    <?php }  else { ?>
+                        <li><a href="./iniciar-sesion.php">Iniciar Sesión</a></li>
+                        <li><a href="./registro.php">Registrarse</a></li>
+                    <?php }?>
+                    
+                </ul>
             </div>
         </div>
     </nav>
-    <div class="container">
+    <div class="container-comic">
         <div class="row">
             <div class="col-md-3">
                 <img class="img-thumbnail comic-info-img" src="<?php echo $result['imagen']?>" alt="">
             </div>
-            <div class="col-md-6">
+            <div class="col-md-6 comic-info" >
                 <div class="title">
-                    <p><?php echo $result['titulo']?></p>
-                    <p>de <?php echo $result['nombre']?></p>
+                    <p class="comic-title"><?php echo $result['titulo']?></p>
+                    <p class="comic-author">de <?php echo $result['nombre']?></p>
                 </div>
                 <div class="price">
-                 <p>$<?php echo $result['precio']?></p>
+                 <p><strong>Precio:</strong> $<?php echo $result['precio']?></p>
                 </div>
                 <div class="description">
+                    <p><strong>Sinopsis</strong></p>
                     <p><?php echo $result['descripcion']?></p>
-                    <p><?php echo $result['nombre_genero']?></p>
-                    <p><?php echo $result['nombre_editorial']?></p>
+                </div>
+                <div class="publisher">
+                    <p class="genre"><strong>Género:</strong> <?php echo $result['nombre_genero']?></p>
+                    <p class="editorial"><strong>Editorial:</strong> <?php echo $result['nombre_editorial']?></p>
                 </div>
             </div>
-            <div class="col-md-3">
-                <form action="./cart.php" method="POST">
+            <div class="col-md-3 cart-button">
+                <?php if ($result['cantidad_en_almacen'] == 0) { $onStock=false?>
+                    <p>Estado: <span class="not-available">No Disponible</span></p>  
+                <?php } else if ($result['cantidad_en_almacen'] < 6) {?>
+                    <p>Estado: <span class="warning">¡Solo quedan <?php echo $result['cantidad_en_almacen']?> copias en existencia!</span></p>
+                <?php } else { ?>
+                    <p>Estado: <span class="available">Disponible!</span></p>
+                <?php } ?>
+                <form action="./carrito.php" method="POST">
+                    <input type="hidden" name="method" value="update">
                     <input type="hidden" name="id" value="<?php echo $result['id_comic']?>">
-                    <button>Añadir al carrito</button>
+                    <?php if (isset($_SESSION['userID']) && $_SESSION['userID'] != "" ) { ?>
+                        <button class="btn btn-success" <?php if (!$onStock) echo "disabled"?>>Añadir al carrito</button>
+                    <?php } else { ?>
+                        <button class="btn btn-success" disabled>Añadir al carrito</button>
+                        <p class="not-available">Para usar esta función debe tener una cuenta</p>
+                    <?php } ?>
                 </form>
                 
-                <p><?php echo $result['cantidad_en_almacen']?></p>
             </div>
         </div>
         
