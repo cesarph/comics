@@ -1,0 +1,35 @@
+.form-container {
+    max-width: 400px;
+    margin: 80px auto;
+}
+.login {
+    max-width: 350px;
+    margin: 0 auto;
+}
+
+.change {
+    margin-top:20px;
+}
+.login-container, .register-container {
+    margin: 0 auto;
+    padding: 20px;
+    background:#e5e6e8;
+    border: 1px solid  #cfcfd1;
+    border-radius: 20px;
+}
+
+.register-container {
+    max-width: 600px;
+    border: 1px solid  #cfcfd1;
+    border-radius: 20px;
+}
+
+.login-container {
+    max-width: 400px;;
+}
+
+.register {
+    max-width: 550px;
+    margin: 0 auto;
+    
+}
