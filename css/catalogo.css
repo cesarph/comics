@@ -3,3 +3,22 @@
     
 }
 
+.container-catalog {
+    margin-top: 40px;
+}
+
+.nav-stacked>li+li {
+    margin-top: 20px;
+}
+.comic-title {
+    font-weight: bold;
+    font-size: 14px;
+}
+.comic-author {
+    color: grey;
+    font-size: 13px;
+}
+
+.comic-price {
+    margin-bottom: 30px;
+}
