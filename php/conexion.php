@@ -1,5 +1,5 @@
-
-  <?php
+<?php
+    session_start();
     $con=mysqli_connect("localhost:3306","root","","proyecto_final");
 
     // Check connection
@@ -7,4 +7,4 @@
       echo "Failed to connect to MySQL: " . mysqli_connect_error();
     }
     
-  ?>
+?>
