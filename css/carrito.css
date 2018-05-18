@@ -1,0 +1,25 @@
+.cart-item-img {
+    max-width: 150px;
+}
+.cart-item {
+    margin-bottom: 20px
+}
+
+.cart-container {
+    margin-top: 40px;
+}
+
+.checkout-form {
+
+    margin: 60px auto;
+}
+
+.checkout-form > form {
+    max-width: 250px;
+    margin: 0 auto;
+    border: 1px solid black;
+    border-radius: 20px;
+    background:#e5e6e8;
+    border: 1px solid #c2c4c6;
+    padding: 30px 40px;
+}
