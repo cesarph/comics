@@ -113,7 +113,7 @@
                                         <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>" method="POST">
                                             <input type="hidden" name="method" value="delete">
                                             <input type="hidden" name="id" value="<?php echo $row['id_carrito'] ?>">
-                                            <button class="btn btn-danger">eliminar</buttton>
+                                            <button class="btn btn-danger">Eliminar</buttton>
                                         </form>
                                     </div>
                                     <div class="col-md-3">
@@ -136,8 +136,8 @@
                     <form action="./checkout.php" method="POST">
                         <p><strong>Total:</strong> $<?php echo $suma?></p>
                         <input type="hidden" name="id" value="<?php echo $_SESSION['userID']?>">
-                        <?php if (isset($_SESSION['userID']) && $_SESSION['userID'] != "") { ?>
-                            <button class="btn btn-success">Proceder al pago</button>
+                        <?php if (isset($_SESSION['userID']) && $_SESSION['userID'] != "" ) { ?>
+                            <button class="btn btn-success" <?php if(!mysqli_num_rows($itemsInCart)) echo "disabled"?>>Proceder al pago</button>
                         <?php } else { ?>
                             <button class="btn btn-success" disabled>Proceder al pago</button>
                             <p class="not-available">Para usar esta función debe tener una cuenta</p>
