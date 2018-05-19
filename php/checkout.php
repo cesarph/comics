@@ -18,7 +18,12 @@
                     
                     while($row = mysqli_fetch_array($itemsInCart)) {
                         $comicID = $row['comic'];
-                        $insertToHistory = mysqli_query($con, "INSERT INTO historial_compras (id_comic, id_usuario) VALUES($comicID, $userID)");    
+                        $insertToHistory = mysqli_query($con, "INSERT INTO historial_compras (id_comic, id_usuario) VALUES($comicID, $userID)");
+
+                        $selectComic = mysqli_query($con, "SELECT cantidad_en_almacen FROM comics WHERE id_comic=$comicID");
+                        $quantity = mysqli_fetch_array($selectComic)['cantidad_en_almacen'];
+                        $newQuantity = $quantity - 1;
+                        $updateComic = mysqli_query($con, "UPDATE SET cantidad_en_almacen=$newQuantity FROM comics WHERE id_comic=$comicID"); 
                     }
                     
                     $deleteCart = mysqli_query($con, "DELETE FROM carrito WHERE usuario=$userID");
