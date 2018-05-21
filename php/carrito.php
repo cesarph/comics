@@ -9,16 +9,25 @@
                 break;
             case 'update':
                 $comicID = $_POST['id'];
+                $quantity = $_POST['quantity'];
                 $userID = $_SESSION['userID'];
-                $addToCart = mysqli_query($con, "INSERT INTO carrito (comic, usuario) VALUES($comicID, $userID)");
+                $addToCart = mysqli_query($con, "INSERT INTO carrito (comic, usuario, cantidad) VALUES($comicID, $userID, $quantity)");
                 break;
+            case 'updateQuantity':
+                $cartID = $_POST['id'];
+                $quantity = $_POST['quantity'];
+                $userID = $_SESSION['userID'];
+                $updateQuantity = mysqli_query($con, "UPDATE carrito SET cantidad=$quantity WHERE id_carrito=$cartID");
         }
         
     }
     $suma = 0;
     if(isset($_SESSION['userID']) && $_SESSION['userID'] != "" ){
         $userID = $_SESSION['userID'];
-        $itemsInCart =  mysqli_query($con, "SELECT ca.id_carrito, c.titulo, c.precio, c.cantidad_en_almacen, c.imagen, a.nombre, g.nombre_genero, ca.usuario 
+        $user = mysqli_query($con, "SELECT u.esAdmin FROM usuarios u WHERE u.id_usuario=$userID");
+        $user = mysqli_fetch_array($user);
+
+        $itemsInCart =  mysqli_query($con, "SELECT ca.id_carrito, ca.cantidad, c.titulo, c.precio, c.cantidad_en_almacen, c.imagen, a.nombre, g.nombre_genero, ca.usuario 
                                         FROM comics c, autor a, carrito ca, genero g, usuarios u 
                                         WHERE c.autor = a.id_autor AND ca.usuario = u.id_usuario AND ca.comic = c.id_comic AND g.id_genero=c.genero AND ca.usuario=$userID");
     
@@ -56,30 +65,32 @@
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 <ul class="nav navbar-nav">
                     <li><a href="./catalogo.php">Catalogo</a></li>
-                    <form class="navbar-form navbar-right" action="./catalogo.php" method="GET">
-                        
-                        <div class="input-group">
-                            <input type="text" class="form-control" name="titulo" placeholder="Buscar">
-                            <span class="input-group-btn">
-                                <button class="btn btn-default"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
-                            </span>
-                        </div>
-                    </form>
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
                     
                     <?php if (isset($_SESSION['userID']) && $_SESSION['userID'] != "") { ?>
-                        <li><a href="./carrito.php">Carrito</a></li>
-                        <li class="dropdown">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Mi cuenta<span class="caret"></span></a>
-                            <ul class="dropdown-menu">
-                                <li><a href="./cuenta.php">Mi cuenta</a></li>
-                                <li><a href="./historial.php">Historial de compras</a></li>
-                                <li role="separator" class="divider"></li>
-                                <li><a href="./cerrar-sesion.php">Cerrar Sesión</a></li>
-                            </ul>
-                        </li>
-                    <?php }  else { ?>
+                        <?php if ($user['esAdmin']) { ?>
+                            <li><a href="./admin.php?method=Añadir">Añadir comic</a></li>
+                            <li class="dropdown">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Admin<span class="caret"></span></a>
+                                <ul class="dropdown-menu">
+                                    <li><a href="./historial.php">Historial de compras</a></li>
+                                    <li role="separator" class="divider"></li>
+                                    <li><a href="./cerrar-sesion.php">Cerrar Sesión</a></li>
+                                </ul>
+                            </li>
+                        <?php } else {?>
+                            <li><a href="./carrito.php">Carrito</a></li>
+                            <li class="dropdown">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Mi cuenta<span class="caret"></span></a>
+                                <ul class="dropdown-menu">
+                                    <li><a href="./cuenta.php">Mi cuenta</a></li>
+                                    <li role="separator" class="divider"></li>
+                                    <li><a href="./cerrar-sesion.php">Cerrar Sesión</a></li>
+                                </ul>
+                            </li>
+                        <?php }
+                        }  else { ?>
                         <li><a href="./iniciar-sesion.php">Iniciar Sesión</a></li>
                         <li><a href="./registro.php">Registrarse</a></li>
                     <?php }?>
@@ -93,30 +104,42 @@
             <div class="col-md-8">
                 <div class="cart-container">                    
                     <div class="row">
-                            <div class="col-md-9">
+                            <div class="col-xs-9">
                                 <strong>Carrito</strong>
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-xs-3">
                                 <strong>Precio </strong>
                             </div>
                     </div>
                     <hr>
                     <?php if (isset($_SESSION['userID']) && $_SESSION['userID'] != "" && mysqli_num_rows($itemsInCart) ) { 
-                        while($row = mysqli_fetch_array($itemsInCart)) { $suma += $row['precio'] ?>
+                        while($row = mysqli_fetch_array($itemsInCart)) { $suma += $row['cantidad']*$row['precio'] ?>
                             <div class="cart-item">
                                 <div class="row">
-                                    <div class="col-md-3">
-                                        <img class="img-thumbnail cart-item-img" src="<?php echo $row['imagen']?>" alt="">
+                                    <div class="col-sm-3 visible-sm visible-md visible-lg">
+                                        <img class="img-thumbnail img-responsive cart-item-img" src="<?php echo $row['imagen']?>" alt="">
                                     </div>
-                                    <div class="col-md-6">
+                                    <div class="col-sm-6 col-xs-9">
                                         <p><?php echo $row['titulo'] ?></p>
+                                        
+                                        <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>" method="POST">
+                                            Cantidad: <select name="quantity" id="quantity">
+                                                <?php for($i = 1; $i <= $row['cantidad_en_almacen']; $i++) { ?>
+                                                    <option value="<?php echo $i ?>" <?php if ($row['cantidad'] == $i) echo "selected"?>><?php echo $i ?></option>
+                                                <?php } ?>
+                                            </select>
+                                            <input type="hidden" name="method" value="updateQuantity">
+                                            <input type="hidden" name="id" value="<?php echo $row['id_carrito'] ?>">
+                                            <button class="btn btn-sm btn-primary">Cambiar</buttton>
+                                        </form>
                                         <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>" method="POST">
                                             <input type="hidden" name="method" value="delete">
                                             <input type="hidden" name="id" value="<?php echo $row['id_carrito'] ?>">
-                                            <button class="btn btn-danger">Eliminar</buttton>
+                                            <button class="btn btn-sm btn-danger">Eliminar</buttton>
                                         </form>
+                                        
                                     </div>
-                                    <div class="col-md-3">
+                                    <div class="col-sm-3 col-xs-3">
                                         <p>$<?php echo $row['precio'] ?> </p>
                                     </div>
                                     
@@ -131,6 +154,7 @@
                 </div>
                 
             </div>
+            
             <div class="col-md-4">
                 <div class="checkout-form">
                     <form action="./checkout.php" method="POST">

@@ -1,11 +1,11 @@
 .cart-item-img {
     max-width: 150px;
 }
-.cart-item {
+.cart-item, .checkout-title {
     margin-bottom: 20px
 }
 
-.cart-container {
+.cart-container, .success-btn {
     margin-top: 40px;
 }
 
@@ -22,4 +22,9 @@
     background:#e5e6e8;
     border: 1px solid #c2c4c6;
     padding: 30px 40px;
+}
+
+
+.checkout-btn {
+    margin-top: 20px;
 }

@@ -1,4 +1,13 @@
-<?php session_start() ?>
+<?php include('./php/conexion.php');
+
+  if (isset($_SESSION['userID']) && $_SESSION['userID'] != "" ){
+    $userID = $_SESSION['userID'];
+    $user = mysqli_query($con, "SELECT u.esAdmin FROM usuarios u WHERE u.id_usuario=$userID");
+    $user = mysqli_fetch_array($user);
+  } else {
+    $user['esAdmin'] = 0;
+  }
+?>
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -26,30 +35,32 @@
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 <ul class="nav navbar-nav">
                     <li><a href="./php/catalogo.php">Catalogo</a></li>
-                    <form class="navbar-form navbar-right" action="./php/catalogo.php" method="GET">
-                        
-                        <div class="input-group">
-                            <input type="text" class="form-control" name="titulo" placeholder="Buscar">
-                            <span class="input-group-btn">
-                                <button class="btn btn-default"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
-                            </span>
-                        </div>
-                    </form>
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
                     
                     <?php if (isset($_SESSION['userID']) && $_SESSION['userID'] != "") { ?>
-                        <li><a href="./php/carrito.php">Carrito</a></li>
-                        <li class="dropdown">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Mi cuenta<span class="caret"></span></a>
-                            <ul class="dropdown-menu">
-                                <li><a href="./php/cuenta.php">Mi cuenta</a></li>
-                                <li><a href="./php/historial.php">Historial de compras</a></li>
-                                <li role="separator" class="divider"></li>
-                                <li><a href="./php/cerrar-sesion.php">Cerrar Sesión</a></li>
-                            </ul>
-                        </li>
-                    <?php }  else { ?>
+                        <?php if ($user['esAdmin']) { ?>
+                            <li><a href="./php/admin.php?method=Añadir">Añadir comic</a></li>
+                            <li class="dropdown">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Admin<span class="caret"></span></a>
+                                <ul class="dropdown-menu">
+                                    <li><a href="./php/historial.php">Historial de compras</a></li>
+                                    <li role="separator" class="divider"></li>
+                                    <li><a href="./php/cerrar-sesion.php">Cerrar Sesión</a></li>
+                                </ul>
+                            </li>
+                        <?php } else {?>
+                            <li><a href="./php/carrito.php">Carrito</a></>
+                            <li class="dropdown">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Mi cuenta<span class="caret"></span></a>
+                                <ul class="dropdown-menu">
+                                    <li><a href="./php/cuenta.php">Mi cuenta</a></li>
+                                    <li role="separator" class="divider"></li>
+                                    <li><a href="./php/cerrar-sesion.php">Cerrar Sesión</a></li>
+                                </ul>
+                            </li>
+                        <?php }
+                        }  else { ?>
                         <li><a href="./php/iniciar-sesion.php">Iniciar Sesión</a></li>
                         <li><a href="./php/registro.php">Registrarse</a></li>
                     <?php }?>
@@ -69,18 +80,30 @@
         <!-- Wrapper for slides -->
         <div class="carousel-inner" role="listbox">
           <div class="item active">
-            <img src="http://i.imgur.com/wwxiFqF.jpg" alt="...">
-            <div class="carousel-caption">
-              ...
-            </div>
+            <a href="./php/comic.php?id=7">
+              <img src="https://www.dccomics.com/sites/default/files/DoomsdayClock_Hub_Marquee_alt_59e142e49a5cd5.83051384.jpg" alt="...">
+              <div class="carousel-caption">
+                ¡Doomsday Clock esta aquí!
+              </div>
+            </a>
           </div>
           <div class="item">
-            <img src="http://i.imgur.com/AsnCmBd.jpg" alt="...">
-            <div class="carousel-caption">
-              ...
-            </div>
+            <a href="./php/comic.php?id=6">
+              <img src="https://i.ytimg.com/vi/IraG0OVeJWU/maxresdefault.jpg" alt="...">
+              <div class="carousel-caption">
+                Comienza Civil War II
+              </div>
+            </a>
           </div>
-          ...
+          <div class="item">
+            <a href="./php/comic.php?id=5">
+              <img src="http://s3-us-west-1.amazonaws.com/dkn-wp/wp-content/uploads/2015/07/02054637/fables-banner.jpg" alt="...">
+              <div class="carousel-caption">
+                ¡Sale Fables #4!
+              </div>
+            </a>
+          </div>
+          
         </div>
 
         <!-- Controls -->
@@ -93,7 +116,29 @@
           <span class="sr-only">Next</span>
         </a>
       </div>
-            
+      <div class="container">
+        <h2 class="title">Destacado</h2>
+        <div class="featured">
+          <div class="row">
+            <div class="col-md-6 col-xs-10">
+              <a href="./php/comic.php?id=1">
+                <img src="http://cdn.collider.com/wp-content/uploads/james_jean_fables_cover_01.jpg" alt="">
+              </a>
+            </div>
+            <div class="col-md-4 col-xs-10 second-img">
+              <a href="./php/comic.php?id=8">
+                <img src="https://static.vix.com/es/sites/default/files/styles/large/public/d/dk-metal.jpg?itok=fJcgay_r" alt="">
+              </a>
+            </div>
+            <div class="col-md-4 col-xs-10">
+              <a href="./php/comic.php?id=9">
+                <img src="https://omegaunderground.com/wp-content/uploads/2016/05/Thor-Planet-Hulk-Banner.jpg" alt="">
+              </a>
+            </div>
+          </div>
+        </div>
+        
+      </div>
 
             
     <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>

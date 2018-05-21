@@ -20,7 +20,14 @@
     if (isset($_POST['confirmPassword'])) {
         $confirmPassword = $_POST['confirmPassword'];
     }
-
+    if (isset($_SESSION['userID']) && $_SESSION['userID'] != "" ){
+        $userID = $_SESSION['userID'];
+        $user = mysqli_query($con, "SELECT u.esAdmin FROM usuarios u WHERE u.id_usuario=$userID");
+        $user = mysqli_fetch_array($user);
+    } else {
+        $user['esAdmin'] = 0;
+    }
+    
     
     if (isset($_POST['user'])) {
         $email = $_POST['user'];
@@ -49,7 +56,6 @@
         }
     }
     
-    
 
 ?>
 
@@ -65,7 +71,7 @@
     <link rel="stylesheet" href="../css/inicio-registro.css">
 </head>
 <body>
-    <nav class="navbar navbar-inverse">
+<nav class="navbar navbar-inverse">
         <div class="container">
             <div class="navbar-header">
             <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
@@ -81,30 +87,32 @@
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 <ul class="nav navbar-nav">
                     <li><a href="./catalogo.php">Catalogo</a></li>
-                    <form class="navbar-form navbar-right" action="./catalogo.php" method="GET">
-                        
-                        <div class="input-group">
-                            <input type="text" class="form-control" name="titulo" placeholder="Buscar">
-                            <span class="input-group-btn">
-                                <button class="btn btn-default"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
-                            </span>
-                        </div>
-                    </form>
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
                     
                     <?php if (isset($_SESSION['userID']) && $_SESSION['userID'] != "") { ?>
-                        <li><a href="./carrito.php">Carrito</a></li>
-                        <li class="dropdown">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Mi cuenta<span class="caret"></span></a>
-                            <ul class="dropdown-menu">
-                                <li><a href="./cuenta.php">Mi cuenta</a></li>
-                                <li><a href="./historial.php">Historial de compras</a></li>
-                                <li role="separator" class="divider"></li>
-                                <li><a href="./cerrar-sesion.php">Cerrar Sesión</a></li>
-                            </ul>
-                        </li>
-                    <?php }  else { ?>
+                        <?php if ($user['esAdmin']) { ?>
+                            <li><a href="./admin.php?method=Añadir">Añadir comic</a></li>
+                            <li class="dropdown">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Admin<span class="caret"></span></a>
+                                <ul class="dropdown-menu">
+                                    <li><a href="./historial.php">Historial de compras</a></li>
+                                    <li role="separator" class="divider"></li>
+                                    <li><a href="./cerrar-sesion.php">Cerrar Sesión</a></li>
+                                </ul>
+                            </li>
+                        <?php } else {?>
+                            <li><a href="./carrito.php">Carrito</a></li>
+                            <li class="dropdown">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Mi cuenta<span class="caret"></span></a>
+                                <ul class="dropdown-menu">
+                                    <li><a href="./cuenta.php">Mi cuenta</a></li>
+                                    <li role="separator" class="divider"></li>
+                                    <li><a href="./cerrar-sesion.php">Cerrar Sesión</a></li>
+                                </ul>
+                            </li>
+                        <?php }
+                        }  else { ?>
                         <li><a href="./iniciar-sesion.php">Iniciar Sesión</a></li>
                         <li><a href="./registro.php">Registrarse</a></li>
                     <?php }?>
@@ -125,31 +133,31 @@
                 <form class="register" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>" method="POST">
                     <div class="form-group">
                         <label for="user" class="control-label">Nombre:</label>
-                        <input type="text" class="form-control" name="name" id="name" value="<?php echo $name ?>">
+                        <input type="text" class="form-control" name="name" id="name" value="<?php echo $name ?>" required>
                     </div>
                     <div class="form-group">
                         <label for="user" class=" control-label">Correo:</label>
-                        <input type="text" class="form-control" name="user" id="user" value="<?php echo $email ?>">
+                        <input type="text" class="form-control" name="user" id="user" value="<?php echo $email ?>" required>
                     </div>
                     <div class="form-group">
                         <label for="password" class=" control-label">Contraseña:</label>
-                        <input type="password" class="form-control" name="password" id="password">
+                        <input type="password" class="form-control" name="password" id="password" required>
                     </div>
                     <div class="form-group">
                         <label for="confirmPassword" class="control-label">Confirmar Contraseña:</label>
-                        <input type="password" class="form-control" name="confirmPassword" id="confirmPassword">
+                        <input type="password" class="form-control" name="confirmPassword" id="confirmPassword" required>
                     </div>
                     <div class="form-group">
                         <label for="birthDate" class="control-label">Fecha de Nacimiento:</label>
-                        <input type="date" class="form-control" name="birthDate" id="birthDate" value="<?php echo $birthDate ?>">
+                        <input type="date" class="form-control" name="birthDate" id="birthDate" value="<?php echo $birthDate ?>" required>
                     </div>
                     <div class="form-group">
                         <label for="creditCard" class="control-label">Número de la Tarjeta:</label>
-                        <input type="text" class="form-control" name="creditCard" id="creditCard" value="<?php echo $creditCard ?>">
+                        <input type="text" class="form-control" name="creditCard" id="creditCard" value="<?php echo $creditCard ?>" required>
                     </div>
                     <div class="form-group">
                         <label for="address" class="control-label">Dirección:</label>
-                        <input type="text" class="form-control" name="address" id="address" value="<?php echo $address ?>">
+                        <input type="text" class="form-control" name="address" id="address" value="<?php echo $address ?>" required>
                     </div>
                     
                     <div class="form-group">

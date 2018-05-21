@@ -1,54 +1,79 @@
 <?php 
     include('conexion.php');
+    $method = "";
+    $category = "";
+    $comicID = "";
 
-    $suma = 0;
+    if (isset($_GET['method'])) {
+        $method = $_GET['method'];
+    }
+    
+    if (isset($_GET['category'])) {
+        $category = $_GET['category'];
+    }
+
+    if (isset($_GET['id'])) {
+        $comicId = $_GET['id'];
+    }
+
+    if (isset($_POST['method'])) {
+        $method = $_POST['method'];
+    }
+    
+    if (isset($_POST['category'])) {
+        $category = $_POST['category'];
+    }
+
+    if (isset($_POST['id'])) {
+        $comicId = $_POST['id'];
+    }
+    
     if (isset($_SESSION['userID']) && $_SESSION['userID'] != "" ){
         $userID = $_SESSION['userID'];
-
-        $user = mysqli_query($con, "SELECT u.id_usuario, u.nombre_usuario, u.tarjeta, u.direccion_postal, u.esAdmin FROM usuarios u WHERE u.id_usuario=$userID");
+        $user = mysqli_query($con, "SELECT u.esAdmin FROM usuarios u WHERE u.id_usuario=$userID");
         $user = mysqli_fetch_array($user);
-
-        $itemsInCart =  mysqli_query($con, "SELECT ca.id_carrito, ca.comic, c.titulo, c.precio, c.cantidad_en_almacen, a.nombre, g.nombre_genero, ca.usuario 
-                                        FROM comics c, autor a, carrito ca, genero g, usuarios u 
-                                        WHERE c.autor = a.id_autor AND ca.usuario = u.id_usuario AND ca.comic = c.id_comic AND g.id_genero=c.genero AND ca.usuario=$userID");
-
-        if(isset($_POST['action'])) {
-            switch ($_POST['action']) {
-                case 'proceed':
-                    
-                    while($row = mysqli_fetch_array($itemsInCart)) {
-                        $comicID = $row['comic'];
-                        $insertToHistory = mysqli_query($con, "INSERT INTO historial_compras (id_comic, id_usuario) VALUES($comicID, $userID)");    
-                    }
-                    
-                    $deleteCart = mysqli_query($con, "DELETE FROM carrito WHERE usuario=$userID");
-                    header('Location: ./compra-exitosa.php');
-                    break;
-            }
-            
+        
+        if (!$user['esAdmin']) {
+            header('Location: ../index.php');
         }
 
-    
     } else {
         header('Location: ../index.php');
     }
 
-    
-?>
+    if (isset($_POST['name'])) {
+        $name = $_POST['name'];
 
+        switch($category) {
+            case 'autor':
+                $author = mysqli_query($con, "INSERT INTO autor (nombre) VALUES ('$name')");
+                break;
+            case 'genero':
+                $genre = mysqli_query($con, "INSERT INTO genero (nombre_genero) VALUES ('$name')");
+                break;
+    
+            case 'editorial':
+                $editorial = mysqli_query($con, "INSERT INTO editorial (nombre_editorial) VALUES ('$name')");
+                break;
+        }
+    }
+      
+    
+
+
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Carrito</title>
+    <title>Agregar <?php echo $category ?></title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
     <link rel="stylesheet" href="../css/index.css">
-    <link rel="stylesheet" href="../css/carrito.css">
+    <link rel="stylesheet" href="../css/inicio-registro.css">
 </head>
 <body>
-    
 <nav class="navbar navbar-inverse">
         <div class="container">
             <div class="navbar-header">
@@ -100,24 +125,27 @@
         </div>
     </nav>
     <div class="container">
-        <div class="row"> 
-            <div class="col-md-8">
-                <div class="cart-container">                    
-                    <div class="row">
-                        <div class="col-md-12">
-                            <h1><strong class="success-title">¡La compra se ha realizado con éxito!</strong></h1>
-                        </div>
+        <div class="form-container">
+            <a href="./admin.php?method=<?php echo $method ?><?php if($method=='Editar') echo "&id=$comicId" ?>">Regresar</a>
+            <div class="register-container">
+                <form class="register" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>" method="POST">
+                    <div class="form-group">
+                        <label for="name" class="control-label">Nombre <?php echo $category ?>:</label>
+                        <input type="text" class="form-control" name="name" id="name" >
                     </div>
-                    <div class="row">
-                        <div class="col-md-12">
-                            <h3><strong class="success-message">¡Gracias por su compra! </strong> Su pedido le llegará en el transcurso de la semana.</h3>
-                        </div>
+                   
+                    <div class="form-group">
+                        <input type="hidden" name="category" value="<?php echo $category ?>">
+                        <input type="hidden" name="method" value="<?php echo $method ?>">
+                        <input type="hidden" name="id" value="<?php echo $comicId ?>">
+                        
+                        <button type="submit" class="btn btn-primary ">Añadir</button>  
                     </div>
-
-                    <a href="./catalogo.php" class="btn btn-success success-btn">Regresar al Catalogo</a>
-                </div>
+                </form>
             </div>
+            
         </div>
+        
     </div>
     <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
