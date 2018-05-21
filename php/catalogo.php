@@ -104,7 +104,7 @@
                     
                     <ul class="nav nav-pills nav-stacked ">
                         <li role="presentation" class="<?php if ($active == "all") active ?>"><a href="./catalogo.php">Todos</a></li>
-                        <li><strong>Generos</strong></li>
+                        <li><strong>Géneros</strong></li>
                         <?php while($row = mysqli_fetch_array($genres)) { ?>
                             <li role="presentation" class="<?php if ($active == strtolower($row['nombre_genero'])) active ?>"><a href="./catalogo.php?genre=<?php echo $row['nombre_genero']?>"><?php echo $row['nombre_genero']?></a></li>
                         <?php    } ?>
